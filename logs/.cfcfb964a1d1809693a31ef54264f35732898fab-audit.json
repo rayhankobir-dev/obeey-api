@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/rajurayhan/obey/obey-api/logs/.cfcfb964a1d1809693a31ef54264f35732898fab-audit.json",
+    "files": [
+        {
+            "date": 1697635617607,
+            "name": "/Users/rajurayhan/obey/obey-api/logs/2023-10-18.log",
+            "hash": "1c8070bde6287da4295b9de315469385967f7fefca9705046abef5b92ce1df78"
+        }
+    ],
+    "hashType": "sha256"
+}
