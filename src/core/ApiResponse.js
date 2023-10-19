@@ -1,5 +1,5 @@
-const StatusCode = {
-  OK: 200,
+const ResponseStatus = {
+  SUCCESS: 200,
   CREATED: 201,
   ACCEPTED: 202,
   NO_CONTENT: 204,
@@ -25,10 +25,6 @@ const StatusCode = {
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
   HTTP_VERSION_NOT_SUPPORTED: 505,
-};
-
-const ResponseStatus = {
-  SUCCESS: 200,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -52,16 +48,15 @@ const ResponseStatus = {
 };
 
 class ApiResponse {
-  constructor(statusCode, status, message) {
+  constructor(statusCode, message) {
     this.statusCode = statusCode;
-    this.status = status;
     this.message = message;
   }
 
   prepare(res, response, headers = {}) {
     for (const [key, value] of Object.entries(headers))
       res.setHeader(key, value);
-    return res.status(this.status).json(ApiResponse.sanitize(response));
+    return res.status(this.statusCode).json(ApiResponse.sanitize(response));
   }
 
   send(res, headers = {}) {
@@ -85,7 +80,7 @@ class AuthFailureResponse extends ApiResponse {
 
 class NotFoundResponse extends ApiResponse {
   constructor(message = "Not Found") {
-    super(StatusCode.FAILURE, ResponseStatus.NOT_FOUND, message);
+    super(ResponseStatus.NOT_FOUND, message);
   }
 
   send(res, headers = {}) {
@@ -95,7 +90,7 @@ class NotFoundResponse extends ApiResponse {
 
 class ForbiddenResponse extends ApiResponse {
   constructor(message = "Forbidden") {
-    super(StatusCode.FAILURE, ResponseStatus.FORBIDDEN, message);
+    super(ResponseStatus.FORBIDDEN, message);
   }
 }
 
@@ -107,11 +102,7 @@ class BadRequestResponse extends ApiResponse {
 
 class InternalErrorResponse extends ApiResponse {
   constructor(message = "Internal Error") {
-    super(
-      StatusCode.INTERNAL_SERVER_ERROR,
-      ResponseStatus.INTERNAL_ERROR,
-      message
-    );
+    super(ResponseStatus.INTERNAL_ERROR, message);
   }
 }
 

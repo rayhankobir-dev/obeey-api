@@ -15,7 +15,7 @@ const ErrorType = {
   BAD_TOKEN: "BadTokenError",
   TOKEN_EXPIRED: "TokenExpiredError",
   ACCESS_TOKEN: "AccessTokenError",
-  INTERNAL_SERVER_ERROR: "InternalServerError",
+  INTERNAL_ERROR: "InternalError",
   NO_ENTRY: "NoEntryError",
   NO_DATA: "NoDataError",
 };

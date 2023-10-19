@@ -12,6 +12,9 @@ datasource db {
 model User {
     uid Int @id @default(autoincrement())
     firstName String @map("first_name")
-    lastName String @map("last_name")
+    lastName String? @map("last_name")
     email String @unique
+    hashedPassword String @map("password")
+    salt String 
+    @@map("users")
 }

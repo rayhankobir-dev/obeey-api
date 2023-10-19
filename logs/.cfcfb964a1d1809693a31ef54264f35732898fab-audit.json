@@ -9,6 +9,11 @@
             "date": 1697635617607,
             "name": "/Users/rajurayhan/obey/obey-api/logs/2023-10-18.log",
             "hash": "1c8070bde6287da4295b9de315469385967f7fefca9705046abef5b92ce1df78"
+        },
+        {
+            "date": 1697694548042,
+            "name": "/Users/rajurayhan/obey/obey-api/logs/2023-10-19.log",
+            "hash": "a0772d6f6720330923635a33ffc9a44721a87b0766dfe59744f79156dfc01064"
         }
     ],
     "hashType": "sha256"
