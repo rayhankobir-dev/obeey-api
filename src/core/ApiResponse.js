@@ -48,9 +48,13 @@ const ResponseStatus = {
 };
 
 class ApiResponse {
-  constructor(statusCode, message) {
+  constructor(statusCode, message, errors = []) {
     this.statusCode = statusCode;
     this.message = message;
+    // send multiple error messages
+    if (errors && errors.length > 0) {
+      this.errors = errors;
+    }
   }
 
   prepare(res, response, headers = {}) {
@@ -74,7 +78,7 @@ class ApiResponse {
 
 class AuthFailureResponse extends ApiResponse {
   constructor(message = "Authentication Failure") {
-    super(StatusCode.FAILURE, ResponseStatus.UNAUTHORIZED, message);
+    super(ResponseStatus.UNAUTHORIZED, message);
   }
 }
 
@@ -95,8 +99,8 @@ class ForbiddenResponse extends ApiResponse {
 }
 
 class BadRequestResponse extends ApiResponse {
-  constructor(message = "Bad Parameters") {
-    super(ResponseStatus.BAD_REQUEST, message);
+  constructor(message = "Bad Parameters", errors) {
+    super(ResponseStatus.BAD_REQUEST, message, errors);
   }
 }
 

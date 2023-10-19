@@ -21,10 +21,11 @@ const ErrorType = {
 };
 
 class ApiError extends Error {
-  constructor(type, message = "error") {
+  constructor(type, message = "error", errors = []) {
     super(type);
     this.type = type;
     this.message = message;
+    this.errors = errors;
   }
 
   static handle(err, res) {
@@ -32,22 +33,22 @@ class ApiError extends Error {
       case ErrorType.BAD_TOKEN:
       case ErrorType.TOKEN_EXPIRED:
       case ErrorType.UNAUTHORIZED:
-        return new AuthFailureResponse(err.message).send(res);
+        return new AuthFailureResponse(err.message, err.errors).send(res);
       case ErrorType.ACCESS_TOKEN:
-        return new AccessTokenErrorResponse(err.message).send(res);
+        return new AccessTokenErrorResponse(err.message, err.errors).send(res);
       case ErrorType.INTERNAL:
-        return new InternalErrorResponse(err.message).send(res);
+        return new InternalErrorResponse(err.message, err.errors).send(res);
       case ErrorType.NOT_FOUND:
       case ErrorType.NO_ENTRY:
       case ErrorType.NO_DATA:
-        return new NotFoundResponse(err.message).send(res);
+        return new NotFoundResponse(err.message, err.errors).send(res);
       case ErrorType.BAD_REQUEST:
-        return new BadRequestResponse(err.message).send(res);
+        return new BadRequestResponse(err.message, err.errors).send(res);
       case ErrorType.FORBIDDEN:
-        return new ForbiddenResponse(err.message).send(res);
+        return new ForbiddenResponse(err.message, err.errors).send(res);
       default: {
         let message = err.message;
-        return new InternalErrorResponse(message).send(res);
+        return new InternalErrorResponse(message, err.errors).send(res);
       }
     }
   }
@@ -72,8 +73,8 @@ class ForbiddenError extends ApiError {
 }
 
 class BadRequestError extends ApiError {
-  constructor(message = "Bad Request") {
-    super(ErrorType.BAD_REQUEST, message);
+  constructor(message = "error", errors = []) {
+    super(ErrorType.BAD_REQUEST, message, errors);
   }
 }
 
@@ -97,7 +98,7 @@ class AccessTokenError extends ApiError {
 
 class InternalError extends ApiError {
   constructor(message = "Internal server error") {
-    super(ErrorType.INTERNAL_SERVER_ERROR, message);
+    super(ErrorType.INTERNAL_ERROR, message);
   }
 }
 
