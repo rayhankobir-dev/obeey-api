@@ -9,12 +9,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AuthenticationType {
+  CREDENTIALS
+  GOOGLE
+}
+
+enum UserRole {
+  GUEST
+  USER
+  UPLOADER
+  ADMIN
+}
+
+model Role {
+  id        String   @id @default(uuid()) @map("id")
+  role      String
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  users     User[]
+
+  @@unique([role])
+  @@map("roles")
+}
+
 model User {
-    uid Int @id @default(autoincrement())
-    firstName String @map("first_name")
-    lastName String? @map("last_name")
-    email String @unique
-    hashedPassword String @map("password")
-    salt String 
-    @@map("users")
+  id                 String             @id @default(uuid())
+  firstName          String             @map("first_name")
+  lastName           String?            @map("last_name")
+  email              String             @unique
+  emailVerified      Boolean            @default(false) @map("email_verified")
+  profileImageURL    String?            @map("profile_img_url")
+  password           String?
+  authenticationType AuthenticationType @default(CREDENTIALS) @map("authentication_type")
+  Keys               Keys?
+  Role               Role               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId             String             @map("role_id")
+
+  @@map("users")
+}
+
+model Keys {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String   @unique @map("user_id")
+  primaryKey   String   @map("primary_key")
+  secondaryKey String   @map("secondary_key")
+  status       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("keys")
 }

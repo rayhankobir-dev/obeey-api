@@ -1,11 +1,11 @@
 const bcrypt = require("bcrypt");
 
-const makeHashed = (plainText) => {
-  const salt = bcrypt.genSaltSync(10);
-  const hashed = bcrypt.hashSync(plainText, salt);
+const makeHashed = async (plainText) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(plainText, salt);
   return {
-    salt,
     hashed,
+    salt,
   };
 };
 

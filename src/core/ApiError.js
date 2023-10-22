@@ -67,13 +67,13 @@ class AuthFailureError extends ApiError {
 }
 
 class ForbiddenError extends ApiError {
-  constructor(message = "Permission denied") {
-    super(ErrorType.FORBIDDEN, message);
+  constructor(message = "Permission denied", errors = []) {
+    super(ErrorType.FORBIDDEN, message, errors);
   }
 }
 
 class BadRequestError extends ApiError {
-  constructor(message = "error", errors = []) {
+  constructor(message = "Bad request", errors = []) {
     super(ErrorType.BAD_REQUEST, message, errors);
   }
 }

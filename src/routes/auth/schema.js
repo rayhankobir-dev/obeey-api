@@ -1,10 +1,28 @@
 const Joi = require("joi");
+const { JoiAuthBearer } = require("../../helpers/validator");
 
-const loginSchema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(30).required(),
-  password: Joi.string().required(),
-});
+const schema = {
+  credential: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(6),
+  }),
 
-module.exports = {
-  loginSchema,
+  refreshToken: Joi.object().keys({
+    refreshToken: Joi.string().required().min(1),
+  }),
+
+  auth: Joi.object()
+    .keys({
+      authorization: JoiAuthBearer().required(),
+    })
+    .unknown(true),
+
+  signup: Joi.object().keys({
+    firstName: Joi.string().required().min(3),
+    lastName: Joi.string().optional().min(3),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(6),
+  }),
 };
+
+module.exports = schema;

@@ -93,14 +93,15 @@ class NotFoundResponse extends ApiResponse {
 }
 
 class ForbiddenResponse extends ApiResponse {
-  constructor(message = "Forbidden") {
-    super(ResponseStatus.FORBIDDEN, message);
+  constructor(message = "Forbidden", errors) {
+    super(ResponseStatus.FORBIDDEN, message, errors);
   }
 }
 
 class BadRequestResponse extends ApiResponse {
-  constructor(message = "Bad Parameters", errors) {
+  constructor(message = "Bad Parameters", errors, code = 400) {
     super(ResponseStatus.BAD_REQUEST, message, errors);
+    this.statusCode = code;
   }
 }
 
@@ -111,8 +112,9 @@ class InternalErrorResponse extends ApiResponse {
 }
 
 class SuccessMsgResponse extends ApiResponse {
-  constructor(message) {
+  constructor(message, code = 200) {
     super(ResponseStatus.SUCCESS, message);
+    this.statusCode = code;
   }
 }
 
@@ -123,8 +125,9 @@ class FailureMsgResponse extends ApiResponse {
 }
 
 class SuccessResponse extends ApiResponse {
-  constructor(message, data) {
+  constructor(message, data, code = 200) {
     super(ResponseStatus.SUCCESS, message);
+    this.statusCode = code;
     this.data = data;
   }
 
