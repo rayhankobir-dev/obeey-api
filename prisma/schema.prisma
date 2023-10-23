@@ -42,14 +42,14 @@ model User {
   profileImageURL    String?            @map("profile_img_url")
   password           String?
   authenticationType AuthenticationType @default(CREDENTIALS) @map("authentication_type")
-  Keys               Keys?
-  Role               Role               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  role               Role               @relation(fields: [roleId], references: [id], onDelete: Cascade)
   roleId             String             @map("role_id")
+  key                Key?
 
   @@map("users")
 }
 
-model Keys {
+model Key {
   id           String   @id @default(uuid())
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String   @unique @map("user_id")

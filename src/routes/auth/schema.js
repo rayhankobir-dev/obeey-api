@@ -22,6 +22,9 @@ const schema = {
     lastName: Joi.string().optional().min(3),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(6),
+    role: Joi.string()
+      .default("USER")
+      .valid("USER", "ADMIN", "GUEST", "UPLOADER"),
   }),
 };
 

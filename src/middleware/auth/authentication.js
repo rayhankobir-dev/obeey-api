@@ -15,17 +15,20 @@ const authentication = () => {
       const payload = await JWT.validate(req.accessToken);
       validateTokenData(payload);
 
-      const user = await prismaClient.user.findFirst({
+      const user = await prismaClient.user.findUnique({
         where: { id: payload.sub },
       });
 
       if (!user) throw new AuthFailureError("User not registered");
       req.user = user;
 
-      const keys = await prismaClient.keys.findFirst({ where: { user: user } });
-      if (!keys) throw new AuthFailureError("Invalid access token");
+      const key = await prismaClient.key.findUnique({
+        where: { userId: user.id, primaryKey: payload.prm },
+      });
 
-      req.keys = keys;
+      if (!key) throw new AuthFailureError("Invalid access token");
+      req.key = key;
+
       return next();
     } catch (err) {
       if (err instanceof TokenExpiredError)

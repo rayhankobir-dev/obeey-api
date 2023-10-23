@@ -31,7 +31,7 @@ const tokenController = asyncHandler(async (req, res) => {
     if (accessTokenPayload.sub !== refreshTokenPayload.sub)
       throw new AuthFailureError("Invalid access token");
 
-    const keys = await prismaClient.keys.findFirst({
+    const key = await prismaClient.key.findUnique({
       where: {
         user: req.user,
         primaryKey: accessTokenPayload.prm,
@@ -39,13 +39,13 @@ const tokenController = asyncHandler(async (req, res) => {
       },
     });
 
-    if (!keys) throw new AuthFailureError("Invalid access token");
-    await prismaClient.keys.delete({ where: { id: keys.id } });
+    if (!key) throw new AuthFailureError("Invalid access token");
+    await prismaClient.key.delete({ where: { id: key.id } });
 
     const accessToken = crypto.randomBytes(64).toString("hex");
     const refreshToken = crypto.randomBytes(64).toString("hex");
 
-    await prismaClient.keys.create({
+    await prismaClient.key.create({
       data: {
         user: req.user,
         primaryKey: accessToken,

@@ -1,22 +1,16 @@
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+const { Prisma } = require("@prisma/client");
 const prismaClient = require("../../models");
-const { makeHashed } = require("../../helpers/lib");
+const { exclude } = require("../../helpers/lib");
+const { createTokens } = require("../../helpers/authUtils");
 const {
   ApiError,
   BadRequestError,
   InternalError,
 } = require("../../core/ApiError");
-const crypto = require("crypto");
-const bcrypt = require("bcrypt");
-const { createTokens } = require("../../helpers/authUtils");
-const { Prisma } = require("@prisma/client");
 
-const signupUser = async ({
-  firstName,
-  lastName,
-  email,
-  password,
-  role = "USER",
-}) => {
+const signupUser = async ({ firstName, lastName, email, password, role }) => {
   try {
     const user = await prismaClient.user.findFirst({ where: { email } });
     if (user) throw new BadRequestError("User already registered!");
@@ -30,42 +24,37 @@ const signupUser = async ({
     const refreshTokenKey = crypto.randomBytes(64).toString("hex");
     const hashPassword = await bcrypt.hash(password, 10);
 
-    const userData = await prismaClient.$transaction(
-      async (prismaClient) => {
-        const createdUser = await prismaClient.user.create({
-          data: {
-            firstName,
-            lastName,
-            email,
-            password: hashPassword,
-            roleId: fetchRole.id,
-          },
-        });
-
-        const keys = await prismaClient.keys.create({
-          data: {
-            userId: createdUser.id,
+    const createdUser = await prismaClient.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashPassword,
+        roleId: fetchRole.id,
+        key: {
+          create: {
             primaryKey: accessTokenKey,
             secondaryKey: refreshTokenKey,
+            status: true,
           },
-        });
-
-        const tokens = await createTokens(
-          createdUser,
-          keys.primaryKey,
-          keys.secondaryKey
-        );
-
-        return { user: createdUser, tokens };
+        },
       },
-      {
-        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-        maxWait: 5000,
-        timeout: 10000,
-      }
+      include: {
+        role: {
+          select: { id: true, role: true },
+        },
+      },
+    });
+
+    // excluding password and roleId
+    const userData = await exclude(createdUser, ["password", "roleId"]);
+    const tokens = await createTokens(
+      userData,
+      accessTokenKey,
+      refreshTokenKey
     );
 
-    return userData;
+    return { user: userData, tokens };
   } catch (err) {
     if (err instanceof ApiError) throw err;
     console.log(err);

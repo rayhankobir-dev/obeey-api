@@ -1,16 +1,24 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
-const asyncHandler = require("../../helpers/asyncHandler");
-const { SuccessResponse } = require("../../core/ApiResponse");
 const prismaClient = require("../../models");
-const { BadRequestError, AuthFailureError } = require("../../core/ApiError");
+const asyncHandler = require("../../helpers/asyncHandler");
 const { createTokens } = require("../../helpers/authUtils");
-// const { registerUser } = require("../../services/auth/register");
+const { SuccessResponse } = require("../../core/ApiResponse");
+const { BadRequestError, AuthFailureError } = require("../../core/ApiError");
+const { exclude } = require("../../helpers/lib");
 
 const loginController = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const user = await prismaClient.user.findUnique({ where: { email } });
+  const user = await prismaClient.user.findUnique({
+    where: { email },
+    include: {
+      role: {
+        select: { id: true, role: true },
+      },
+      key: true,
+    },
+  });
 
   if (!user) throw new BadRequestError("Invalid credentials");
   if (!user.password) throw new BadRequestError("Password not set");
@@ -21,8 +29,11 @@ const loginController = asyncHandler(async (req, res) => {
   const accessTokenKey = crypto.randomBytes(64).toString("hex");
   const refreshTokenKey = crypto.randomBytes(64).toString("hex");
 
-  await prismaClient.keys.delete({ where: { userId: user.id } });
-  await prismaClient.keys.create({
+  if (user.key) {
+    await prismaClient.key.delete({ where: { id: user.key.id } });
+  }
+
+  await prismaClient.key.create({
     data: {
       userId: user.id,
       primaryKey: accessTokenKey,
@@ -30,10 +41,11 @@ const loginController = asyncHandler(async (req, res) => {
     },
   });
 
-  const tokens = await createTokens(user, accessTokenKey, refreshTokenKey);
+  const userData = await exclude(user, ["password", "roleId", "key"]);
+  const tokens = await createTokens(userData, accessTokenKey, refreshTokenKey);
 
   new SuccessResponse("Login successfull", {
-    user,
+    user: userData,
     tokens,
   }).send(res);
 });

@@ -32,6 +32,12 @@ const redis = {
   password: process.env.REDIS_PASSWORD || "",
 };
 
+const cloud = {
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  apiKey: process.env.CLOUDINARY_API_KEY,
+  apiSecret: process.env.CLOUDINARY_API_SECRET,
+};
+
 const caching = {
   contentCacheDuration: parseInt(
     process.env.CONTENT_CACHE_DURATION_MILLIS || "600000"
@@ -47,6 +53,7 @@ module.exports = {
   tokenInfo,
   logDirectory,
   redis,
+  cloud,
   tokenInfo,
   caching,
 };

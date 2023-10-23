@@ -22,4 +22,13 @@ router.post("/signup", validation(schema.signup), signUpController);
 router.delete("/logout", authentication(), logoutController);
 router.post("/token", tokenController);
 
+router.get(
+  "/autho",
+  authentication(),
+  authorization(["ADMIN", "USER"]),
+  (req, res) => {
+    res.send("Perfect");
+  }
+);
+
 module.exports = { router };
